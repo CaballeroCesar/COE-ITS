@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="61"> <!-- Refresh the page every minute -->
+    <link rel="icon" href="https://emoji.slack-edge.com/T4H0SB963/dog-dance/098bc4274b068bd0.gif" type="image/gif" />
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/snow.css">
+    <title>ITS Office Status</title>  
+  </head>
+  <body>
+    
+  <div class="weather-info">
+    <h2><strong><%= Math.round(currentWeather.temperature_2m) %>°F</strong></h2>
+    <!-- <p>Weather Code: <%= currentWeather.weather_code %></p> -->
+    <h2><strong><%= weatherInfo.description %></strong></h2>
+    <img src="<%= weatherInfo.iconURL %>" alt="Weather Icon">
+  </div>
+
+    
+
+  <div class="ground"></div> 
+  <!-- Start Snow HTML https://codepen.io/codeconvey/pen/xRzQay -->
+<!--   <div class="snowflakes" aria-hidden="true">
+  <div class="intro"></div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❄</div>
+  <div class="snowflake">❅</div>
+  <div class="snowflake">❆</div>
+  <div class="snowflake">❄</div>
+  </div> -->
+  <!-- End Snow HTML -->
+    
+  <% function statusTable(statuses, tdStyle) { %>
+    <table>
+      <tbody>
+        <% statuses.forEach(status => { %>
+          <tr>
+            <!-- Add an image tag to display the user's profile picture -->
+            <!-- Display user's name, presence, and status -->
+            <td class="<%= status.presence === 'active' ? 'active' : 'inactive' %> <%= isBirthday(status.name) ? 'birthday' : '' %>" style="<%= tdStyle %>">
+              <% if (isBirthday(status.name)) { %>
+                <div style="position: relative;">
+                  <img src="https://cdn.glitch.global/66406a35-bb99-486f-9247-3506ecef87ea/party-hat.png?v=1709245620602" style="width: 50px; height: 50px; position: absolute; top: -38px; left: -15px; transform: scaleX(-1); z-index: -1;" />
+                  <img src="<%= status.profilePictureUrl %>" alt="<%= status.name %> Profile Picture">&nbsp;
+                </div>
+              <% } else { %>
+                <img src="<%= status.profilePictureUrl %>" alt="<%= status.name %> Profile Picture">&nbsp;
+              <% } %>
+              <% if (isBirthday(status.name)) { %>
+                <strong>Happy Birthday <%= status.name %>!</strong>
+              <% } else { %>
+                <strong><%= status.name %></strong>
+              <% } %>
+              <% if (status.emoji) { %> 
+                &nbsp;-&nbsp;<img src="<%= status.emoji %>"/>&nbsp;<%= status.status %>
+              <% } %>
+              <% if (status.huddle == "In a huddle") { %> 
+                &nbsp;-&nbsp;<img src="<%= status.huddleEmoji %>"/>&nbsp;<%= status.huddle %>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+    
+  <div class="container">
+    <div style="display: flex; border-radius: 10px; overflow: hidden; box-shadow: 5px 10px 18px #888888;">
+      <!-- Left Column Statuses -->
+      <% statusTable(leftColStatuses, ''); %>
+
+      <!-- Right Column Statuses with the specified style -->
+      <% statusTable(rightColStatuses, 'height: 125.5px;'); %>
+    </div> 
+  </div> 
+
+  <script>
+    const socket = new WebSocket('ws://' + window.location.hostname + ':3000'); // Add WebSocket connection logic
+    let body = document.body
+    let bodyWidth = body.offsetWidth;
+    let bodyHeight = body.offsetHeight;
+
+    function checkBodyWithAndHeight(){
+      let timoeutId = setTimeout(()=> {
+        bodyWidth = body.offsetWidth;
+        bodyHeight = body.offsetHeight;
+        clearTimeout(timoeutId)
+        checkBodyWithAndHeight()
+      }, 500)
+    }
+
+
+    function toggleBodyAnimation(){
+      let randomTimeForBodyAnimation = Math.floor(Math.random() * 7000)
+
+      let setTimeoutId = setTimeout(()=> {
+        body.classList.toggle("body-animation")
+        clearInterval(setTimeoutId)
+        toggleBodyAnimation()
+      }, randomTimeForBodyAnimation)
+    }
+    toggleBodyAnimation()
+
+
+
+
+    function createRainDrop(){
+        let position = -150;
+        let newLeftPosition = 2
+        let puddleWidth = 0;
+
+        for (let i = 0; i < 150; i ++){
+          let rainDrop = document.createElement("span")
+          rainDrop.classList.add(  "raindrop")
+          rainDrop.id = `${i}`
+          body.appendChild(rainDrop)
+
+          checkBodyWithAndHeight()
+
+          let randomLeftPosition = Math.floor(Math.random() * bodyWidth)
+          let randomTopPosition = Math.floor(Math.random() * (bodyHeight - bodyHeight + 150))
+          let randomHeight = Math.floor(2 + (Math.random() * 5))
+
+          rainDrop.style.height = randomHeight + "px"
+          rainDrop.style.top = randomTopPosition + "px"
+          rainDrop.style.left = randomLeftPosition + "px"
+
+          if(parseInt(rainDrop.style.top) > bodyHeight){
+            rainDrop.remove()
+            console.log("test")
+          }
+
+          function rain(){
+            let setIntervalId = setInterval(()=>{
+              position = position + 2
+              randomTopPosition = randomTopPosition + position
+              rainDrop.style.top = randomTopPosition + "px"
+
+              puddleWidth = puddleWidth + 2
+              if(puddleWidth > 700){
+                puddleWidth = 0
+              }
+
+              if(parseInt(rainDrop.style.top) > bodyHeight - 80){
+                let puddle = document.createElement("span")
+                puddle.classList.add("puddle")
+                body.appendChild(puddle)
+
+                puddle.style.width = puddleWidth + "px";
+                puddle.style.top = randomTopPosition + "px"
+                puddle.style.left = parseInt(rainDrop.style.left) - (puddleWidth / 2) + "px"            
+
+
+
+                let timeoutId = setTimeout(()=>{
+                  puddle.classList.add("puddle-drop")
+                  clearTimeout(timeoutId)
+                  puddle.remove()
+                  puddleWidth = 0
+                }, 1000)
+
+
+                  let puddleDropleft = 0;
+                for(let j = 0; j < 2; j ++){
+                  if(j = 0){
+                    puddleDropleft = -5;
+                  }
+                  if(j = 1){
+                    puddleDropleft = 2;
+                  }
+                  let puddleDrop = document.createElement("span")
+                  puddleDrop.classList.add("puddle-drop")
+                  puddleDrop.style.left = puddleDropleft + "px"
+                  puddle.appendChild(puddleDrop)
+
+                }
+
+                position = 0;
+                randomTopPosition = 0;
+                rainDrop.style.left = randomLeftPosition + "px";
+              }
+              clearInterval(setIntervalId)
+              rain()
+            }, 35)
+          }
+          rain()
+
+
+      }
+
+    }
+    createRainDrop()                                              
+  </script>
+
+  </body>
+</html>
