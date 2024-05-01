@@ -1,0 +1,71 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  background-color: SkyBlue;
+}
+.container {
+  width: 90%;
+  margin-left:auto; 
+  margin-right:auto;
+  order: 1; /* Move the container to the bottom */
+}
+table {
+  border-collapse: collapse;
+  width: 50%;
+}
+td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  font-size: 25px;
+}
+img {
+  width: 100px;
+  height: 100px;
+  border-radius: 20%;
+}
+.active {
+  background-color: LimeGreen; /* Set background color to green for active users */
+  /* background-image: url('https://emoji.slack-edge.com/T4H0SB963/dog-dance/098bc4274b068bd0.gif');
+        background-repeat: no-repeat;
+        background-size: 50px;  */
+}
+.inactive {
+  background-color: Silver; /* Set background color to gray for inactive users */
+}
+.birthday {
+  border: 3px solid;
+  border-image: linear-gradient(
+      to right,
+      red,
+      orange,
+      yellow,
+      green,
+      blue,
+      indigo,
+      violet
+    )
+    1;
+  color: red;
+  animation: pulse 1.5s infinite alternate; /* Pulsating animation */
+}
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+.weather-info {
+  text-align: center;
+  order: -1; /* Move the weather info to the top */
+}
